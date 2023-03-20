@@ -1,5 +1,6 @@
 package com.skypro.auction.repository;
 
+import com.skypro.auction.dto.BidDTO;
 import com.skypro.auction.model.Bid;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,6 +37,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             value = "SELECT bidder_name AS bidderName, bid_date AS bidDate FROM bid WHERE lot_id = ?1 ORDER BY bid_date DESC LIMIT 1"
             , nativeQuery = true
     )
-    Bid getInfoAboutLastBidDate(Long id);
+    BidDTO getInfoAboutLastBidDate(Long id);
 }
 

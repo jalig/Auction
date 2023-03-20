@@ -8,14 +8,13 @@ import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
 import com.skypro.auction.repository.BidRepository;
 import com.skypro.auction.repository.LotRepository;
-import liquibase.pro.packaged.F;
-import liquibase.pro.packaged.S;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,22 +48,18 @@ public class LotService {
         return fullLot;
     }
 
-    public CreateLot updateToStartedLot(CreateLot createLot) { // Начать торги по лоту
-        Lot lot = createLot.toLot();
+    public void updateToStartedLot(Long id) { // Начать торги по лоту
+        logger.info("Lot status updated to: {}", Status.STARTED);
+        Lot lot = lotRepository.findById(id).get();
         lot.setStatus(Status.STARTED.toString());
-        Lot createdLot = lotRepository.save(lot);
-        logger.info("Created lot: {} ", createLot);
-        return CreateLot.fromLot(createdLot);
+        lotRepository.save(lot);
     }
 
-    //   Сделать ставку по лоту
-
-    public CreateLot updateToStopLot(CreateLot createLot) { // Остановить торги по лоту
-        Lot lot = createLot.toLot();
+    public void updateToStoppedLot(Long id) { // Остановить торги по лоту
+        logger.info("Lot status updated to: {}", Status.STOPPED);
+        Lot lot = lotRepository.findById(id).get();
         lot.setStatus(Status.STOPPED.toString());
-        Lot createdLot = lotRepository.save(lot);
-        logger.info("Created lot: {} ", createLot);
-        return CreateLot.fromLot(createdLot);
+        lotRepository.save(lot);
     }
 
     public CreateLot createLot(CreateLot createLot) { // Создает новый лот
@@ -76,20 +71,12 @@ public class LotService {
     }
 
 
-    public List<CreateLot> findLotsByStatus(String status, Pageable pageable) { //Получить все лоты, основываясь на фильтре статуса и номере страницы
+    public List<FullLot> findLotsByStatus(String status, Pageable pageable) { // Получить все лоты, основываясь на фильтре статуса и номере страницы
         logger.info("Found all lots where status: {}", status);
         return lotRepository.findAllByStatusContainingIgnoreCase(status, pageable)
                 .stream()
-                .map(CreateLot::fromLot)
+                .map(FullLot::fromLot)
                 .collect(Collectors.toList());
-    }
-
-    public BidDTO createBid(BidDTO bidDTO) {
-        Bid bid = bidDTO.toBid();
-        bid.setBidDate(LocalDateTime.now());
-        Bid createdBid = bidRepository.save(bid);
-        logger.info("Created bid: {} ", createdBid);
-        return BidDTO.fromBid(createdBid);
     }
 
     public FullLot findLotById(Long id) {
@@ -97,12 +84,35 @@ public class LotService {
         return FullLot.fromLot(lotRepository.findById(id).get());
     }
 
+    public BidDTO createBid(BidDTO bidDTO) {
+        Lot lot = findLotById(bidDTO.getLotId()).toLot();
+        Bid bid = bidDTO.toBid();
+        bid.setBidDate(LocalDateTime.now());
+        bid.setLot(lot);
+        Bid createdBid = bidRepository.save(bid);
+        logger.info("Created bid: {} ", createdBid);
+        return BidDTO.fromBid(createdBid);
+    }
+
     private Integer currentPrice(Long id, Integer bidPrice, Integer startPrice) {
         return Math.toIntExact((bidRepository.bidCount(id) * bidPrice + startPrice));
     }
 
 
+
+
+
     //Метод с экспортом в csv напишу как пойму что не тупой
+
+//    public Collection<Bid> getAllLotsForExport() {
+//        return lotRepository.findAll().stream()
+//                .map(FullLot::fromLot)
+//                .peek(lot -> lot.setCurrentPrice(currentPrice(lot.getId(), lot.getBidPrice(), lot.getStartPrice())))
+//                .peek(lot -> lot.setLastBid(BidDTO.fromBid()))
+//                .collect(Collectors.toList());
+//    }
+
+
 
 
 }
