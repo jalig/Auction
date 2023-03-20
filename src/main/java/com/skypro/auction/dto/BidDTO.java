@@ -3,10 +3,12 @@ package com.skypro.auction.dto;
 import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class BidDTO {
     private String bidderName;
     private LocalDateTime bidDate;

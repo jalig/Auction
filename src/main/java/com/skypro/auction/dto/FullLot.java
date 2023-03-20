@@ -3,8 +3,10 @@ package com.skypro.auction.dto;
 import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class FullLot {
 
     private Long id;

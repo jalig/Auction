@@ -10,6 +10,7 @@ import com.skypro.auction.repository.BidRepository;
 import com.skypro.auction.repository.LotRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -71,9 +72,10 @@ public class LotService {
     }
 
 
-    public List<FullLot> findLotsByStatus(String status, Pageable pageable) { // Получить все лоты, основываясь на фильтре статуса и номере страницы
+    public List<FullLot> findLotsByStatus(String status, Integer pageNumber) { // Получить все лоты, основываясь на фильтре статуса и номере страницы
         logger.info("Found all lots where status: {}", status);
-        return lotRepository.findAllByStatusContainingIgnoreCase(status, pageable)
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, 10);
+        return lotRepository.findAllByStatus(status, pageRequest)
                 .stream()
                 .map(FullLot::fromLot)
                 .collect(Collectors.toList());

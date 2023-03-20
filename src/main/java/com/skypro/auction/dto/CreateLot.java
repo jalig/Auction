@@ -2,8 +2,10 @@ package com.skypro.auction.dto;
 
 import com.skypro.auction.model.Lot;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class CreateLot {
 
     private String title;

@@ -2,12 +2,14 @@ package com.skypro.auction.model;
 
 import com.skypro.auction.enums.Status;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class Lot {
 
     @Id

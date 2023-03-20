@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query(
-            value = "SELECT bidder_name AS bidderName, bid_date AS bidDate FROM bid AS b WHERE b ORDER BY bid_date LIMIT 1"
-            , nativeQuery = true
+            value = "SELECT bidder_name AS bidderName, bid_date AS bidDate FROM bid AS b WHERE b.lot_id = ?1 ORDER BY bid_date LIMIT 1",
+            nativeQuery = true
     )
     Optional<Bid> findInfoAboutFirstBidder(Long id);
 

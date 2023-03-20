@@ -119,16 +119,12 @@ public class Lots {
 
 
     @GetMapping  //Получить все лоты, основываясь на фильтре статуса и номере страницы
-    @Parameters({
-            @Parameter(name = "page"),
-            @Parameter(name = "size"),
-    })
     public ResponseEntity<Collection<FullLot>> getAllLots(
-            @Parameter(hidden = true) @PageableDefault(size = 10) Pageable pageable,
-            @RequestParam Status lotStatus
+            @RequestParam Status lotStatus,
+            @RequestParam(name = "page", required = false) Integer pageNumber
     ) {
 
-        return ResponseEntity.ok(lotService.findLotsByStatus(lotStatus.toString(), pageable));
+        return ResponseEntity.ok(lotService.findLotsByStatus(lotStatus.toString(), pageNumber));
     }
 
 //    @GetMapping("/export") //Экспортировать все лоты в файл CSV
