@@ -1,5 +1,6 @@
 package com.skypro.auction.dto;
 
+import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
 import lombok.Data;
 
@@ -11,7 +12,9 @@ public class FullLot {
     private String title;
     private String description;
     private Integer startPrice;
+    private Integer currentPrice;
     private Integer bidPrice;
+    private Bid lastBid;
 
     public static FullLot fromLot(Lot lot) {
         FullLot fullLot = new FullLot();
@@ -21,6 +24,7 @@ public class FullLot {
         fullLot.setDescription(lot.getDescription());
         fullLot.setStartPrice(lot.getStartPrice());
         fullLot.setBidPrice(lot.getBidPrice());
+        fullLot.setLastBid(lot.getBids().get(lot.getBids().size()-1));
         return fullLot;
     }
 

@@ -22,9 +22,4 @@ public class Lot {
     @OneToMany(mappedBy = "lot")
     List<Bid> bids;
 
-    public Lot() {
-        this.status = Status.CREATED.toString();
-    }
-
-
 }
