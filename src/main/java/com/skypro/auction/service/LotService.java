@@ -6,6 +6,7 @@ import com.skypro.auction.dto.FullLot;
 import com.skypro.auction.enums.Status;
 import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
+import com.skypro.auction.projection.BidView;
 import com.skypro.auction.repository.BidRepository;
 import com.skypro.auction.repository.LotRepository;
 import org.slf4j.Logger;
@@ -37,15 +38,15 @@ public class LotService {
         return BidDTO.fromBid(bidRepository.findInfoAboutFirstBidder(id).get());
     }
 
-    public BidDTO findHighestNumberOfBets(Long id) { // Возвращает имя ставившего на данный лот наибольшее количество раз
-        return BidDTO.fromBid(bidRepository.findHighestNumberOfBets(id).get());
+    public BidView findHighestNumberOfBets(Long id) { // Возвращает имя ставившего на данный лот наибольшее количество раз
+        return bidRepository.findHighestNumberOfBets(id);
     }
 
     public FullLot findAllInformationAboutLot(Long id) { // Получить полную информацию о лоте
         FullLot fullLot = FullLot.fromLot(lotRepository.findById(id).get());
         Integer currentPrice = currentPrice(id, fullLot.getBidPrice(), fullLot.getStartPrice());
         fullLot.setCurrentPrice(currentPrice);
-        fullLot.setLastBid(getInfoAboutFirstBidder(id).toBid());
+        fullLot.setLastBid(bidRepository.getInfoAboutLastBidDate(id));
         return fullLot;
     }
 
@@ -100,19 +101,13 @@ public class LotService {
         return Math.toIntExact((bidRepository.bidCount(id) * bidPrice + startPrice));
     }
 
-
-
-
-
-    //Метод с экспортом в csv напишу как пойму что не тупой
-
-//    public Collection<Bid> getAllLotsForExport() {
-//        return lotRepository.findAll().stream()
-//                .map(FullLot::fromLot)
-//                .peek(lot -> lot.setCurrentPrice(currentPrice(lot.getId(), lot.getBidPrice(), lot.getStartPrice())))
-//                .peek(lot -> lot.setLastBid(BidDTO.fromBid()))
-//                .collect(Collectors.toList());
-//    }
+    public Collection<FullLot> getAllLotsForExport() { //    Метод с экспортом в csv
+        return lotRepository.findAll().stream()
+                .map(FullLot::fromLot)
+                .peek(lot -> lot.setCurrentPrice(currentPrice(lot.getId(), lot.getBidPrice(), lot.getStartPrice())))
+                .peek(lot -> lot.setLastBid(bidRepository.getInfoAboutLastBidDate(lot.getId())))
+                .collect(Collectors.toList());
+    }
 
 
 

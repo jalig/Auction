@@ -4,6 +4,7 @@ import com.skypro.auction.dto.BidDTO;
 import com.skypro.auction.dto.CreateLot;
 import com.skypro.auction.dto.FullLot;
 import com.skypro.auction.enums.Status;
+import com.skypro.auction.projection.BidView;
 import com.skypro.auction.service.LotService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -14,6 +15,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 
 @RestController
@@ -28,27 +33,27 @@ public class Lots {
     }
 
     @GetMapping("/{id}/first") //Получить информацию о первом ставившем на лоте
-    public ResponseEntity<BidDTO> getInfoAboutFirstBidder(@PathVariable Long id) {
+    public ResponseEntity<FullLot> getInfoAboutFirstBidder(@PathVariable Long id) {
         if (lotService.findLotById(id) == null) {
             return ResponseEntity.notFound().build();
         }
         if (lotService.findLotById(id).getStatus().equals(Status.CREATED.toString())) {
             return ResponseEntity.badRequest().build();
         }
-        BidDTO firstBidder = lotService.getInfoAboutFirstBidder(id);
+        FullLot firstBidder = lotService.findAllInformationAboutLot(id);
         return ResponseEntity.ok(firstBidder);
     }
 
     @GetMapping("/{id}/frequent") //Возвращает имя ставившего на данный лот наибольшее количество раз
-    public ResponseEntity<BidDTO> findHighestNumberOfBets(@PathVariable Long id) {
+    public ResponseEntity<BidView> findHighestNumberOfBets(@PathVariable Long id) {
         if (lotService.findLotById(id) == null) {
             return ResponseEntity.notFound().build();
         }
         if (lotService.findLotById(id).getStatus().equals(Status.CREATED.toString())) {
             return ResponseEntity.badRequest().build();
         }
-        BidDTO bidDTO = lotService.findHighestNumberOfBets(id);
-        return ResponseEntity.ok(bidDTO);
+        BidView bidView = lotService.findHighestNumberOfBets(id);
+        return ResponseEntity.ok(bidView);
     }
 
     @GetMapping("/{id}") //Получить полную информацию о лоте
@@ -127,28 +132,28 @@ public class Lots {
         return ResponseEntity.ok(lotService.findLotsByStatus(lotStatus.toString(), pageNumber));
     }
 
-//    @GetMapping("/export") //Экспортировать все лоты в файл CSV
-//    public void downloadLotTable(HttpServletResponse response) throws IOException {
-//        Collection<FullLot> lots = lotService.getAllLotsForExport();
-//        StringWriter writer = new StringWriter();
-//        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
-//
-//        for (FullLot lot : lots) {
-//            csvPrinter.printRecord(lot.getId(),
-//                    lot.getTitle(),
-//                    lot.getStatus(),
-//                    lot.getLastBid() != null ? lot.getLastBid().getBidderName() : "",
-//                    lot.getCurrentPrice());
-//        }
-//        csvPrinter.flush();
-//
-//        response.setContentType("text/csv");
-//        response.setHeader("Content-Disposition", "attachment; filename=\"lots.csv\"");
-//
-//        PrintWriter pWriter = response.getWriter();
-//        pWriter.write(writer.toString());
-//        pWriter.flush();
-//        pWriter.close();
-//    }
+    @GetMapping("/export") //Экспортировать все лоты в файл CSV
+    public void downloadLotTable(HttpServletResponse response) throws IOException {
+        Collection<FullLot> lots = lotService.getAllLotsForExport();
+        StringWriter writer = new StringWriter();
+        CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+
+        for (FullLot lot : lots) {
+            csvPrinter.printRecord(lot.getId(),
+                    lot.getTitle(),
+                    lot.getStatus(),
+                    lot.getLastBid() != null ? lot.getLastBid().getBidderName() : "",
+                    lot.getCurrentPrice());
+        }
+        csvPrinter.flush();
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"lots.csv\"");
+
+        PrintWriter pWriter = response.getWriter();
+        pWriter.write(writer.toString());
+        pWriter.flush();
+        pWriter.close();
+    }
 
 }

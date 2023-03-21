@@ -2,6 +2,7 @@ package com.skypro.auction.repository;
 
 import com.skypro.auction.dto.BidDTO;
 import com.skypro.auction.model.Bid;
+import com.skypro.auction.projection.BidView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,19 +14,17 @@ import java.util.Optional;
 public interface BidRepository extends JpaRepository<Bid, Long> {
 
     @Query(
-            value = "SELECT bidder_name AS bidderName, bid_date AS bidDate FROM bid AS b WHERE b.lot_id = ?1 ORDER BY bid_date LIMIT 1",
+            value = "SELECT * FROM bid WHERE lot_id = ?1 ORDER BY bid_date LIMIT 1",
             nativeQuery = true
     )
     Optional<Bid> findInfoAboutFirstBidder(Long id);
 
     @Query(
-            value = "SELECT bidder_name AS bidderName, MAX(b.bids) AS max_bids, MAX(last_bid_date) AS bidDate " +
-            "FROM (SELECT bidder_name, COUNT(*) AS bids, MAX(bid_date) AS last_bid_date " +
-            "FROM bid WHERE lot_id = ?1 GROUP BY bidder_name) AS b " +
-            "GROUP BY bidder_name ORDER BY max_bids DESC LIMIT 1",
+            value = "SELECT bidder_name as bidderName, MAX(bid_date) as bidDate " +
+                    "FROM bid WHERE lot_id = ?1 GROUP BY bidder_name ORDER BY COUNT(*) DESC LIMIT 1",
             nativeQuery = true
     )
-    Optional<Bid> findHighestNumberOfBets(Long id);
+    BidView findHighestNumberOfBets(Long id);
 
     @Query(
             value = "SELECT COUNT(*) FROM bid WHERE lot_id = ?1"
@@ -37,6 +36,6 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
             value = "SELECT bidder_name AS bidderName, bid_date AS bidDate FROM bid WHERE lot_id = ?1 ORDER BY bid_date DESC LIMIT 1"
             , nativeQuery = true
     )
-    BidDTO getInfoAboutLastBidDate(Long id);
+    BidView getInfoAboutLastBidDate(Long id);
 }
 

@@ -1,7 +1,9 @@
 package com.skypro.auction.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.skypro.auction.model.Bid;
 import com.skypro.auction.model.Lot;
+import com.skypro.auction.projection.BidView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +18,8 @@ public class FullLot {
     private Integer startPrice;
     private Integer currentPrice;
     private Integer bidPrice;
-    private Bid lastBid;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private BidView lastBid;
 
     public static FullLot fromLot(Lot lot) {
         FullLot fullLot = new FullLot();
@@ -26,7 +29,6 @@ public class FullLot {
         fullLot.setDescription(lot.getDescription());
         fullLot.setStartPrice(lot.getStartPrice());
         fullLot.setBidPrice(lot.getBidPrice());
-        fullLot.setLastBid(lot.getBids().get(lot.getBids().size()-1));
         return fullLot;
     }
 
