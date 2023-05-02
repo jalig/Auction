@@ -1,25 +1,21 @@
 package com.skypro.auction.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class Bid {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String bidderName;
-    private LocalDateTime bidDate;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private LocalDateTime bidDate = LocalDateTime.now();
     @ManyToOne(fetch = FetchType.LAZY)
     private Lot lot;
-
 }

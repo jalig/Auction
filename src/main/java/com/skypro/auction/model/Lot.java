@@ -1,21 +1,22 @@
 package com.skypro.auction.model;
 
 import com.skypro.auction.enums.Status;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 public class Lot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private String title;
     @Column(length = 4096)
     private String description;
