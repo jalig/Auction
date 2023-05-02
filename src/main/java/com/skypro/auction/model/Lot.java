@@ -1,19 +1,22 @@
 package com.skypro.auction.model;
 
 import com.skypro.auction.enums.Status;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 public class Lot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private String title;
     @Column(length = 4096)
     private String description;
@@ -21,10 +24,5 @@ public class Lot {
     private Integer bidPrice;
     @OneToMany(mappedBy = "lot")
     List<Bid> bids;
-
-    public Lot() {
-        this.status = Status.CREATED.toString();
-    }
-
 
 }

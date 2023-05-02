@@ -1,9 +1,11 @@
 package com.skypro.auction.dto;
 
 import com.skypro.auction.model.Lot;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class CreateLot {
 
     private String title;
